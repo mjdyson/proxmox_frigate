@@ -1,0 +1,206 @@
+mqtt:
+  host: 192.168.1.2
+  port: 1883
+  user: homeassistant
+  password: xxxx
+
+detectors:
+  coral:
+    type: edgetpu
+    device: usb
+
+ffmpeg:
+  global_args:
+    - -an
+  hwaccel_args: preset-vaapi
+
+objects:
+  track:
+    - person
+    - cat
+    - car
+
+motion:
+  threshold: 50
+
+record:
+  enabled: True
+  events:
+    pre_capture: 5
+    post_capture: 5
+    objects:
+      - person
+    required_zones: []
+    retain:
+      default: 10
+      objects:
+        person: 15
+
+snapshots:
+  enabled: True
+  timestamp: True
+  bounding_box: True
+  crop: True
+  required_zones: []
+  retain:
+    default: 10
+    objects:
+      person: 50
+      cat: 10
+      car: 1
+
+birdseye:
+  enabled: True
+  mode: continuous
+
+cameras:
+  doorbell:
+    ffmpeg:
+      inputs:
+        - path: rtsp://localhost:8554/doorbell
+          roles:
+            - record
+            - detect
+
+    rtmp:
+      enabled: false
+ 
+    live:
+      stream_name: doorbell
+
+    best_image_timeout: 15
+
+    detect:
+      enabled: True
+      max_disappeared: 25
+      width: 1600
+      height: 1200
+      fps: 5
+
+    mqtt:
+      enabled: True
+      timestamp: True
+      bounding_box: True
+      crop: True
+      height: 720
+      quality: 90
+      required_zones: []
+
+  front_garden:
+    ffmpeg:
+      inputs:
+        - path: rtsp://localhost:8554/front_garden_medium
+          roles:
+            - record
+            - detect
+
+    rtmp:
+      enabled: false
+ 
+    live:
+      stream_name: front_garden
+
+    best_image_timeout: 15
+
+    detect:
+      enabled: True
+      max_disappeared: 25
+      width: 1920
+      height: 1080
+      fps: 5
+
+    mqtt:
+      enabled: True
+      timestamp: True
+      bounding_box: True
+      crop: True
+      height: 720
+      quality: 90
+      required_zones: []
+
+  back_garden:
+    ffmpeg:
+      inputs:
+        - path: rtsp://localhost:8554/back_garden_medium
+          roles:
+            - record
+            - detect
+
+    rtmp:
+      enabled: false
+ 
+    live:
+      stream_name: back_garden
+    
+    best_image_timeout: 15
+
+    detect:
+      enabled: True
+      max_disappeared: 25
+      width: 1920
+      height: 1080
+      fps: 5
+
+    mqtt:
+      enabled: True
+      timestamp: True
+      bounding_box: True
+      crop: True
+      height: 720
+      quality: 90
+      required_zones: []
+  
+  side_garden:
+    ffmpeg:
+      inputs:
+        - path: rtsp://localhost:8554/side_garden_medium
+          roles:
+            - record
+            - detect
+
+    rtmp:
+      enabled: false
+ 
+    live:
+      stream_name: side_garden
+    
+    best_image_timeout: 15
+
+    detect:
+      enabled: True
+      max_disappeared: 25
+      width: 2688
+      height: 1512
+      fps: 5
+
+    mqtt:
+      enabled: True
+      timestamp: True
+      bounding_box: True
+      crop: True
+      height: 720
+      quality: 90
+      required_zones: []
+
+go2rtc:
+  streams:
+    # the IP address used in this is my NVR, which provides the streams from the cameras
+    # this means frigate creates local streams for use throughout this config rtsp://localost:8554.... etc
+    back_garden:
+      - rtspx://192.168.1.1:7441/yvk38jX4NSmPORFO
+    front_garden:
+      - rtspx://192.168.1.1:7441/TdxqGFGTl3zp4j5X
+    doorbell:
+      - rtspx://192.168.1.1:7441/ELImIjBMwc630CGb
+    side_garden:
+      - rtspx://192.168.1.1:7441/aEhTGlZXNVefDBrM
+    back_garden_medium:
+      - rtspx://192.168.1.1:7441/sIa550qjQrGdbBiH
+    side_garden_medium:
+      - rtspx://192.168.1.1:7441/oerqbRFkoCm6mZ36
+    front_garden_medium:
+      - rtspx://192.168.1.1:7441/BUzqZRfnrOnmjLrE
+  webrtc:
+    candidates:
+      - 192.168.1.3:8555 #this is the frigate IP address
+      - stun:8555

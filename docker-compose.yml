@@ -1,0 +1,25 @@
+
+version: "3.9"
+services:
+  frigate:
+    container_name: frigate9
+    privileged: true # this may not be necessary for all setups
+    restart: unless-stopped
+    image: ghcr.io/blakeblackshear/frigate:stable
+    shm_size: '256mb'
+    devices:
+      - /dev/bus/usb:/dev/bus/usb
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /root/frigate/config/config.yml:/config/config.yml
+      - /root/frigate/media:/media/frigate
+      - type: tmpfs # Optional: 1GB of memory, reduces SSD/SD Card wear
+        target: /tmp/cache
+        tmpfs:
+          size: 1000000000
+    ports:
+      - "5000:5000"
+      - "1935:1935" # RTMP feeds
+      - "8554:8554" # RTSP feeds
+    environment:
+      FRIGATE_RTSP_PASSWORD: "xxxxx"
